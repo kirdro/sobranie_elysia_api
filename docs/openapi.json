@@ -1,0 +1,196 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Elysia Documentation",
+    "description": "Development documentation",
+    "version": "0.0.0"
+  },
+  "paths": {
+    "/users/": {
+      "get": {
+        "operationId": "getUsers",
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "operationId": "getUsersById",
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/circles/": {
+      "get": {
+        "operationId": "getCircles",
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/circles/{id}": {
+      "get": {
+        "operationId": "getCirclesById",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/posts/": {
+      "get": {
+        "operationId": "getPosts",
+        "responses": {
+          "200": {}
+        }
+      },
+      "post": {
+        "parameters": [],
+        "operationId": "postPosts",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "authorId": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "circleId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "authorId",
+                  "content"
+                ]
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "authorId": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "circleId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "authorId",
+                  "content"
+                ]
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "authorId": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "circleId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "authorId",
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/notifications/": {
+      "get": {
+        "operationId": "getNotifications",
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/assistant/modes": {
+      "get": {
+        "operationId": "getAssistantModes",
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/assistant/sessions": {
+      "post": {
+        "operationId": "postAssistantSessions",
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/realtime/health": {
+      "get": {
+        "operationId": "getRealtimeHealth",
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/navigation/links": {
+      "get": {
+        "operationId": "getNavigationLinks",
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "operationId": "getHealthz",
+        "responses": {
+          "200": {}
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {}
+  }
+}

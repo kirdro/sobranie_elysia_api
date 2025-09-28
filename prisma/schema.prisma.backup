@@ -1,0 +1,14 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Временная заглушка, чтобы prisma generate выполнялся.
+/// Заменить на реальные модели при реализации доменов.
+model InitPlaceholder {
+  id Int @id @default(autoincrement())
+}

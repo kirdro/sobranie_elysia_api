@@ -1,0 +1,3 @@
+api.sobranie.yaropolk.tech {
+    reverse_proxy sobranie-api:3000
+}

@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  sobranie-api:
+    image: ${SOBRANIE_API_IMAGE:-ghcr.io/example/sobranie-elysia-api:latest}
+    container_name: sobranie-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    command: ["bun", "run", "start"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - caddy
+
+networks:
+  caddy:
+    external: true

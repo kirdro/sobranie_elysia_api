@@ -1,0 +1,621 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                       String  @id @default(dbgenerated("(gen_random_uuid())::text"))
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String?
+  access_token             String?
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String?
+  session_state            String?
+  refresh_token_expires_in Int?
+  User                     User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([provider, providerAccountId])
+}
+
+model AiChatMessage {
+  id        String   @id
+  content   String
+  userId    String
+  isAI      Boolean  @default(false)
+  modelName String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        String   @id
+  content   String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+}
+
+model ContactForm {
+  id        String   @id
+  name      String
+  email     String
+  message   String
+  status    String   @default("new")
+  userId    String?
+  createdAt DateTime @default(now())
+  User      User?    @relation(fields: [userId], references: [id])
+
+  @@index([status, createdAt])
+}
+
+model Project {
+  id          String   @id
+  title       String
+  description String
+  imageUrl    String?
+  demoUrl     String?
+  githubUrl   String?
+  tags        String[] @default([])
+  featured    Boolean  @default(false)
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  User        User     @relation(fields: [userId], references: [id])
+
+  @@index([featured, createdAt])
+}
+
+model Session {
+  id           String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime @db.Timestamptz(6)
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Settings {
+  id    String @id
+  key   String @unique
+  value Json
+}
+
+model Skill {
+  id                String    @id
+  name              String    @unique
+  category          String
+  level             Int
+  icon              String?
+  createdAt         DateTime? @default(now())
+  description       String?
+  order             Int?      @default(0)
+  updatedAt         DateTime?
+  yearsOfExperience Int?
+
+  @@index([category])
+  @@index([order])
+}
+
+model User {
+  id            String          @id @default(dbgenerated("(gen_random_uuid())::text"))
+  name          String?
+  email         String?         @unique
+  emailVerified DateTime?       @db.Timestamptz(6)
+  image         String?
+  role          UserRole        @default(USER)
+  Account       Account[]
+  AiChatMessage AiChatMessage[]
+  ChatMessage   ChatMessage[]
+  ContactForm   ContactForm[]
+  Project       Project[]
+  Session       Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime @db.Timestamptz(6)
+
+  @@unique([identifier, token])
+}
+
+model ElectricityAttachment {
+  A                    String
+  B                    String
+  electricity_readings electricity_readings @relation(fields: [A], references: [id], onDelete: Cascade)
+  files                files                @relation(fields: [B], references: [id], onDelete: Cascade)
+
+  @@id([A, B], map: "_ElectricityAttachment_AB_pkey")
+  @@index([B], map: "_ElectricityAttachment_B_index")
+  @@map("_ElectricityAttachment")
+}
+
+model ProductImage {
+  A        String
+  B        String
+  files    files    @relation(fields: [A], references: [id], onDelete: Cascade)
+  products products @relation(fields: [B], references: [id], onDelete: Cascade)
+
+  @@id([A, B], map: "_ProductImage_AB_pkey")
+  @@index([B], map: "_ProductImage_B_index")
+  @@map("_ProductImage")
+}
+
+model RagCaseStudyTechnologies {
+  A                    String
+  B                    String
+  rag_case_studies     rag_case_studies     @relation(fields: [A], references: [id], onDelete: Cascade)
+  rag_technology_items rag_technology_items @relation(fields: [B], references: [id], onDelete: Cascade)
+
+  @@id([A, B], map: "_RagCaseStudyTechnologies_AB_pkey")
+  @@index([B], map: "_RagCaseStudyTechnologies_B_index")
+  @@map("_RagCaseStudyTechnologies")
+}
+
+model balance_transactions {
+  id                String             @id
+  amount            Float
+  type              TransactionType
+  description       String
+  balanceBefore     Float
+  balanceAfter      Float
+  createdAt         DateTime           @default(now())
+  userBalanceId     String
+  billId            String?
+  electricity_bills electricity_bills? @relation(fields: [billId], references: [id])
+  user_balances     user_balances      @relation(fields: [userBalanceId], references: [id], onDelete: Cascade)
+}
+
+model electricity_bills {
+  id                   String                 @id
+  period               String
+  totalConsumption     Float
+  normalConsumption    Float
+  excessConsumption    Float
+  normalCost           Float
+  excessCost           Float
+  totalCost            Float
+  calculatedAt         DateTime               @default(now())
+  status               BillStatus             @default(CALCULATED)
+  userId               String
+  teamId               String?
+  readingId            String                 @unique
+  tariffId             String
+  balance_transactions balance_transactions[]
+  electricity_readings electricity_readings   @relation(fields: [readingId], references: [id])
+  tariffs              tariffs                @relation(fields: [tariffId], references: [id])
+  teams                teams?                 @relation(fields: [teamId], references: [id])
+  users                users                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, period])
+}
+
+model electricity_readings {
+  id                    String                  @id
+  currentReading        Float
+  previousReading       Float?
+  consumption           Float?
+  readingDate           DateTime
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime
+  userId                String
+  teamId                String?
+  tariffId              String
+  ElectricityAttachment ElectricityAttachment[]
+  electricity_bills     electricity_bills?
+  tariffs               tariffs                 @relation(fields: [tariffId], references: [id])
+  teams                 teams?                  @relation(fields: [teamId], references: [id])
+  users                 users                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model files {
+  id                    String                  @id
+  size                  Int
+  uploadedBy            String
+  createdAt             DateTime                @default(now())
+  mimeType              String
+  originalName          String
+  s3Key                 String                  @unique
+  s3Url                 String
+  updatedAt             DateTime
+  ElectricityAttachment ElectricityAttachment[]
+  ProductImage          ProductImage[]
+}
+
+model products {
+  id           String         @id
+  name         String
+  description  String?
+  price        Float
+  category     String?
+  quantity     Float?
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  teamId       String?
+  ProductImage ProductImage[]
+  teams        teams?         @relation(fields: [teamId], references: [id])
+}
+
+model rag_case_studies {
+  id                       String                     @id
+  title                    String
+  description              String
+  gradient                 String
+  icon                     String
+  metrics                  Json
+  order                    Int                        @default(0)
+  isActive                 Boolean                    @default(true)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime
+  RagCaseStudyTechnologies RagCaseStudyTechnologies[]
+
+  @@index([order])
+}
+
+model rag_companies {
+  id                   String                 @id
+  name                 String                 @unique
+  description          String
+  established          Int
+  employees            Int
+  projects_count       Int
+  clients_count        Int
+  logo_url             String?
+  website_url          String?
+  created_at           DateTime               @default(now())
+  updated_at           DateTime
+  rag_company_contacts rag_company_contacts[]
+  rag_offices          rag_offices[]
+  rag_social_links     rag_social_links[]
+}
+
+model rag_company_contacts {
+  id            String        @id
+  company_id    String
+  type          String
+  value         String
+  label         String?
+  is_primary    Boolean       @default(false)
+  created_at    DateTime      @default(now())
+  rag_companies rag_companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+}
+
+model rag_company_stats {
+  id         String   @id
+  value      String
+  order      Int      @default(0)
+  color      String?
+  created_at DateTime @default(now())
+  icon       String?
+  is_active  Boolean  @default(true)
+  title      String
+  unit       String?
+  updated_at DateTime
+
+  @@index([order])
+}
+
+model rag_contact_submissions {
+  id         String   @id
+  name       String
+  email      String
+  company    String?
+  message    String
+  source     String   @default("website")
+  status     String   @default("new")
+  ip_address String?
+  user_agent String?
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  @@index([created_at])
+  @@index([status])
+}
+
+model rag_development_process {
+  id          String   @id
+  title       String
+  description String
+  icon        String
+  step        Int
+  color       String
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+
+  @@index([step, order])
+}
+
+model rag_faqs {
+  id         String   @id
+  question   String
+  answer     String
+  category   String?
+  sort_order Int      @default(0)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  @@index([sort_order])
+}
+
+model rag_offices {
+  id            String        @id
+  company_id    String
+  name          String
+  city          String
+  country       String        @default("Россия")
+  address       String
+  phone         String?
+  email         String?
+  type          String?
+  timezone      String?
+  working_hours Json?
+  latitude      Float?
+  longitude     Float?
+  is_active     Boolean       @default(true)
+  created_at    DateTime      @default(now())
+  updated_at    DateTime
+  rag_companies rag_companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+}
+
+model rag_services {
+  id          String   @id
+  title       String
+  description String
+  icon        String
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+
+  @@index([order])
+}
+
+model rag_site_content {
+  id          String   @id
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+}
+
+model rag_social_links {
+  id            String        @id
+  company_id    String
+  platform      String
+  url           String
+  created_at    DateTime      @default(now())
+  rag_companies rag_companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+}
+
+model rag_team_members {
+  id           String   @id
+  position     String
+  avatar       String?
+  order        Int      @default(0)
+  bio          String
+  created_at   DateTime @default(now())
+  email        String?
+  is_active    Boolean  @default(true)
+  linkedin_url String?
+  name         String
+  skills       String[] @default([])
+  updated_at   DateTime
+
+  @@index([order])
+}
+
+model rag_technologies {
+  id                   String                 @id
+  title                String
+  description          String?
+  icon                 String
+  color                String
+  order                Int                    @default(0)
+  isActive             Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  rag_technology_items rag_technology_items[]
+
+  @@index([order])
+}
+
+model rag_technology_items {
+  id                       String                     @id
+  title                    String
+  description              String?
+  technologyId             String
+  order                    Int                        @default(0)
+  isActive                 Boolean                    @default(true)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime
+  RagCaseStudyTechnologies RagCaseStudyTechnologies[]
+  rag_technologies         rag_technologies           @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+
+  @@index([technologyId, order])
+}
+
+model rag_why_choose_us {
+  id          String   @id
+  title       String
+  description String
+  order       Int      @default(0)
+  created_at  DateTime @default(now())
+  icon        String?
+  is_active   Boolean  @default(true)
+  updated_at  DateTime
+
+  @@index([order])
+}
+
+model tariffs {
+  id                   String                 @id
+  name                 String
+  description          String?
+  normalRate           Float
+  excessRate           Float
+  normalLimit          Int
+  effectiveFrom        DateTime
+  isActive             Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  normalLimitPerPerson Float                  @default(150)
+  electricity_bills    electricity_bills[]
+  electricity_readings electricity_readings[]
+}
+
+model task_projects {
+  id          String       @id
+  teamId      String
+  name        String
+  description String?
+  createdBy   String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime
+  users       users        @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  teams       teams        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  time_tasks  time_tasks[]
+
+  @@index([name])
+  @@index([teamId])
+}
+
+model teams {
+  id                    String                 @id
+  name                  String                 @unique
+  description           String?
+  isActive              Boolean                @default(true)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime
+  registeredPeopleCount Int                    @default(1)
+  normalLimitPerPerson  Float                  @default(150)
+  electricity_bills     electricity_bills[]
+  electricity_readings  electricity_readings[]
+  products              products[]
+  task_projects         task_projects[]
+  time_entries          time_entries[]
+  time_tasks            time_tasks[]
+  user_balances         user_balances[]
+  users                 users[]
+}
+
+model time_entries {
+  id              String     @id
+  teamId          String
+  timeTaskId      String
+  userId          String
+  startTime       DateTime
+  endTime         DateTime?
+  durationSeconds Int?
+  note            String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime
+  teams           teams      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  time_tasks      time_tasks @relation(fields: [timeTaskId], references: [id], onDelete: Cascade)
+  users           users      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([endTime])
+  @@index([teamId, startTime])
+  @@index([timeTaskId])
+  @@index([userId])
+}
+
+model time_tasks {
+  id            String         @id
+  teamId        String
+  taskProjectId String?
+  title         String
+  description   String?
+  status        TimeTaskStatus @default(ACTIVE)
+  createdBy     String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime
+  time_entries  time_entries[]
+  users         users          @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  task_projects task_projects? @relation(fields: [taskProjectId], references: [id])
+  teams         teams          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([taskProjectId])
+  @@index([teamId])
+}
+
+model user_balances {
+  id                   String                 @id
+  currentBalance       Float                  @default(0)
+  lastUpdated          DateTime
+  createdAt            DateTime               @default(now())
+  userId               String                 @unique
+  teamId               String?
+  balance_transactions balance_transactions[]
+  teams                teams?                 @relation(fields: [teamId], references: [id])
+  users                users                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model users {
+  id                   String                 @id
+  email                String                 @unique
+  password             String
+  firstName            String?
+  lastName             String?
+  role                 Role                   @default(USER)
+  isActive             Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  teamId               String?
+  avatarId             String?
+  electricity_bills    electricity_bills[]
+  electricity_readings electricity_readings[]
+  task_projects        task_projects[]
+  time_entries         time_entries[]
+  time_tasks           time_tasks[]
+  user_balances        user_balances?
+  teams                teams?                 @relation(fields: [teamId], references: [id])
+}
+
+enum BillStatus {
+  CALCULATED
+  PAID
+  OVERDUE
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TimeTaskStatus {
+  ACTIVE
+  DONE
+  ARCHIVED
+}
+
+enum TransactionType {
+  PAYMENT
+  BILL_CHARGE
+  ADJUSTMENT
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}

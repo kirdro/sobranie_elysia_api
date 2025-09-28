@@ -1,15 +1,56 @@
 {
-  "name": "sobranie_elysia_api",
-  "version": "1.0.50",
+  "name": "sobranie-elysia-api",
+  "version": "0.1.0",
+  "description": "Sobranie real-time social platform API on Elysia.js, Prisma, PostgreSQL, TypeScript, Bun",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "build": "bun build src/index.ts --outdir dist",
+    "postinstall": "prisma generate",
+    "migrate:dev": "bunx prisma migrate dev",
+    "migrate:deploy": "bunx prisma migrate deploy",
+    "seed": "bunx prisma db seed",
+    "check:db": "bun run scripts/check-db.ts",
+    "db:views": "bun run scripts/setup-views.ts",
+    "docs:openapi": "bun run scripts/export-openapi.ts",
+    "start:with-docs": "bun run scripts/export-openapi.ts && bun run start",
+    "lint": "eslint . --ext .ts",
+    "test": "bun test",
+    "test:e2e": "bunx playwright test"
   },
   "dependencies": {
-    "elysia": "latest"
+    "@elysiajs/cors": "^1.4.0",
+    "@elysiajs/openapi": "^1.4.11",
+    "@elysiajs/websocket": "^0.2.8",
+    "@prisma/client": "^5.17.0",
+    "@types/pg": "^8.15.5",
+    "dotenv": "^16.4.5",
+    "elysia": "^1.4.8",
+    "jose": "^5.3.0",
+    "pg": "^8.16.3",
+    "pino": "^8.17.0",
+    "pino-pretty": "^10.2.0",
+    "postgres": "^3.4.4",
+    "prom-client": "^15.1.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "@playwright/test": "^1.45.0",
+    "@types/node": "^20.14.9",
+    "@types/ws": "^8.5.10",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "bun-types": "^1.0.6",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "patch-package": "^8.0.0",
+    "prisma": "^5.17.0",
+    "tsup": "^8.1.0",
+    "typescript": "^5.4.5"
   },
-  "module": "src/index.js"
+  "prisma": {
+    "seed": "bun run prisma/seed.ts"
+  }
 }

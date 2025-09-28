@@ -1,0 +1,2 @@
+-- SQL definitions for Sobranie analytical views and triggers.
+-- TODO: заполнить инструкциями после моделирования данных.

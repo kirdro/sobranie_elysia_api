@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  sobranie-api:
+    image: ghcr.io/yaropolk/sobranie-api:latest
+    container_name: sobranie-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3010:3000"  # Используем порт 3010 на хосте
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=3000
+    env_file:
+      - .env.production
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - sobranie-network
+      - caddy_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  sobranie-network:
+    driver: bridge
+  caddy_network:
+    external: true
