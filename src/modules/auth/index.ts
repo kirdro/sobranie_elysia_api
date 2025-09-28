@@ -251,7 +251,7 @@ export const authModule = new Elysia({
   })
   // Проверка токена и получение профиля
   .get("/me", async ({ headers, prisma, set }) => {
-    const authHeader = headers.authorization || headers.Authorization;
+    const authHeader = headers.authorization;
     const token = authHeader?.replace(/^Bearer\s+/i, "");
     
     if (!token) {
@@ -332,7 +332,7 @@ export const authModule = new Elysia({
   })
   // Смена пароля
   .post("/change-password", async ({ body, headers, prisma, set }) => {
-    const authHeader = headers.authorization || headers.Authorization;
+    const authHeader = headers.authorization;
     const token = authHeader?.replace(/^Bearer\s+/i, "");
     
     if (!token) {

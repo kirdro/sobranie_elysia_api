@@ -9,14 +9,7 @@ let sseConnections = 0;
 export const realtimeModule = new Elysia({
   name: "realtime",
   prefix: "/realtime",
-  tags: ["realtime"],
-  detail: {
-    description: "Real-time communication endpoints including WebSocket and Server-Sent Events (SSE)",
-    tags: [{
-      name: "realtime",
-      description: "⚡ Real-time features for live updates, chat, and notifications.\n\n**Note:** This module includes both REST endpoints and real-time protocols:\n- `/realtime/ws` - WebSocket endpoint (use ws:// protocol)\n- `/realtime/events` - Server-Sent Events stream\n- Other endpoints are standard REST APIs"
-    }]
-  }
+  tags: ["realtime"]
 })
   .model({
     "realtime.health": t.Object({

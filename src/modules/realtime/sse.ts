@@ -76,7 +76,10 @@ export const createSSEModule = () => {
   return new Elysia({ name: "sse-handler" })
     .use(prismaPlugin)
     .use(authPlugin)
-    .get("/events", async ({ auth, prisma, set, request }) => {
+    .get("/events", async (context) => {
+      const { set, request } = context;
+      const auth = (context as any).auth;
+      const prisma = (context as any).prisma;
       // Проверка авторизации
       if (!auth.userId) {
         set.status = 401;
@@ -105,15 +108,10 @@ export const createSSEModule = () => {
             // Отправляем начальные данные
             
             // 1. Количество непрочитанных уведомлений
+            // TODO: Создать таблицу notifications в БД
             const [unreadNotifications, unreadMessages] = await Promise.all([
-              prisma.notifications.count({
-                where: {
-                  userId,
-                  isRead: false
-                }
-              }),
-              // TODO: Подсчет непрочитанных сообщений
-              Promise.resolve(0)
+              Promise.resolve(0), // Заглушка пока нет таблицы notifications
+              Promise.resolve(0)  // Заглушка для сообщений
             ]);
             
             sendSSEEvent(controller, SSEEventType.UNREAD_COUNT, {
@@ -123,23 +121,8 @@ export const createSSEModule = () => {
             });
             
             // 2. Последние непрочитанные уведомления
-            const recentNotifications = await prisma.notifications.findMany({
-              where: {
-                userId,
-                isRead: false
-              },
-              orderBy: { createdAt: "desc" },
-              take: 5,
-              select: {
-                id: true,
-                type: true,
-                title: true,
-                message: true,
-                relatedId: true,
-                createdAt: true,
-                isRead: true
-              }
-            });
+            // TODO: Использовать реальные данные когда будет таблица notifications
+            const recentNotifications: any[] = [];
             
             for (const notification of recentNotifications) {
               sendSSEEvent(controller, SSEEventType.NOTIFICATION, {
@@ -158,24 +141,8 @@ export const createSSEModule = () => {
               
               try {
                 // Проверяем новые уведомления
-                const newNotifications = await prisma.notifications.findMany({
-                  where: {
-                    userId,
-                    createdAt: {
-                      gt: new Date(Date.now() - 5000) // За последние 5 секунд
-                    }
-                  },
-                  orderBy: { createdAt: "desc" },
-                  select: {
-                    id: true,
-                    type: true,
-                    title: true,
-                    message: true,
-                    relatedId: true,
-                    createdAt: true,
-                    isRead: true
-                  }
-                });
+                // TODO: Использовать реальные данные когда будет таблица notifications
+                const newNotifications: any[] = [];
                 
                 // Отправляем новые уведомления
                 for (const notification of newNotifications) {
@@ -189,12 +156,7 @@ export const createSSEModule = () => {
                 // Обновляем счетчики если есть новые
                 if (newNotifications.length > 0) {
                   const [totalUnread, unreadMessages] = await Promise.all([
-                    prisma.notifications.count({
-                      where: {
-                        userId,
-                        isRead: false
-                      }
-                    }),
+                    Promise.resolve(0), // TODO: Использовать реальные данные
                     Promise.resolve(0)
                   ]);
                   

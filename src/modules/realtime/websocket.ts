@@ -186,7 +186,8 @@ export const createWebSocketModule = () => {
       },
       
       async open(ws) {
-        const { auth } = ws.data;
+        // TODO: Добавить проверку авторизации через auth плагин
+        const auth = { userId: null }; // Временная заглушка
         
         // Проверка авторизации
         if (!auth.userId) {
@@ -231,7 +232,8 @@ export const createWebSocketModule = () => {
         if (!client) return;
         
         client.lastActivity = new Date();
-        const { prisma } = ws.data;
+        // TODO: Добавить доступ к prisma через плагин
+        const prisma = null as any; // Временная заглушка
         
         switch (message.type) {
           case "subscribe": {
