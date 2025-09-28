@@ -1,0 +1,19 @@
+# Bun
+bun.lockb
+node_modules
+
+# Env files
+.env
+.env.*
+prisma/.env
+
+# Build output
+dist
+coverage
+
+# Logs
+*.log
+logs
+
+# Prisma
+prisma/migrations
