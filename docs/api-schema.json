@@ -1,0 +1,491 @@
+{
+  "apiVersion": "1.0",
+  "baseUrl": "https://api.sobranie.yaropolk.tech",
+  "authentication": {
+    "type": "Bearer",
+    "header": "Authorization",
+    "format": "Bearer {token}"
+  },
+  "endpoints": {
+    "auth": {
+      "register": {
+        "method": "POST",
+        "path": "/auth/register",
+        "requiresAuth": false,
+        "body": {
+          "email": "string (email format, required)",
+          "password": "string (min 8 chars, required)",
+          "firstName": "string (optional)",
+          "lastName": "string (optional)"
+        },
+        "responses": {
+          "200": {
+            "accessToken": "string",
+            "tokenType": "Bearer",
+            "expiresIn": "number",
+            "user": {
+              "id": "string",
+              "email": "string",
+              "firstName": "string|null",
+              "lastName": "string|null",
+              "role": "string"
+            }
+          },
+          "409": { "error": "string", "message": "string" }
+        }
+      },
+      "login": {
+        "method": "POST",
+        "path": "/auth/login",
+        "requiresAuth": false,
+        "body": {
+          "email": "string (email format, required)",
+          "password": "string (required)"
+        },
+        "responses": {
+          "200": {
+            "accessToken": "string",
+            "tokenType": "Bearer",
+            "expiresIn": "number",
+            "user": {
+              "id": "string",
+              "email": "string",
+              "firstName": "string|null",
+              "lastName": "string|null",
+              "role": "string"
+            }
+          },
+          "401": { "error": "string", "message": "string" },
+          "403": { "error": "string", "message": "string" }
+        }
+      },
+      "me": {
+        "method": "GET",
+        "path": "/auth/me",
+        "requiresAuth": true,
+        "responses": {
+          "200": {
+            "id": "string",
+            "email": "string",
+            "firstName": "string|null",
+            "lastName": "string|null",
+            "role": "string",
+            "isActive": "boolean",
+            "createdAt": "string (ISO 8601)",
+            "teamId": "string|null",
+            "avatarId": "string|null"
+          },
+          "401": { "error": "string", "message": "string" }
+        }
+      },
+      "changePassword": {
+        "method": "POST",
+        "path": "/auth/change-password",
+        "requiresAuth": true,
+        "body": {
+          "currentPassword": "string (required)",
+          "newPassword": "string (min 8 chars, required)"
+        },
+        "responses": {
+          "200": { "success": "boolean", "message": "string" },
+          "401": { "error": "string", "message": "string" }
+        }
+      }
+    },
+    "users": {
+      "list": {
+        "method": "GET",
+        "path": "/users/",
+        "requiresAuth": true,
+        "queryParams": {
+          "page": "number (optional, default: 1)",
+          "limit": "number (optional, default: 20)"
+        },
+        "responses": {
+          "200": {
+            "items": [
+              {
+                "id": "string",
+                "email": "string",
+                "firstName": "string|null",
+                "lastName": "string|null",
+                "role": "string",
+                "isActive": "boolean",
+                "createdAt": "string (ISO 8601)"
+              }
+            ],
+            "total": "number",
+            "page": "number",
+            "limit": "number"
+          }
+        }
+      },
+      "getById": {
+        "method": "GET",
+        "path": "/users/:id",
+        "requiresAuth": true,
+        "pathParams": {
+          "id": "string (user ID)"
+        },
+        "responses": {
+          "200": {
+            "id": "string",
+            "email": "string",
+            "firstName": "string|null",
+            "lastName": "string|null",
+            "role": "string",
+            "isActive": "boolean",
+            "createdAt": "string (ISO 8601)",
+            "updatedAt": "string (ISO 8601)",
+            "teamId": "string|null",
+            "avatarId": "string|null"
+          },
+          "404": { "error": "string", "message": "string" }
+        }
+      }
+    },
+    "circles": {
+      "list": {
+        "method": "GET",
+        "path": "/circles/",
+        "requiresAuth": false,
+        "queryParams": {
+          "page": "number (optional)",
+          "limit": "number (optional)"
+        },
+        "responses": {
+          "200": {
+            "items": [
+              {
+                "id": "string",
+                "name": "string",
+                "description": "string|null",
+                "isPrivate": "boolean",
+                "memberCount": "number",
+                "createdAt": "string (ISO 8601)",
+                "createdBy": "string"
+              }
+            ],
+            "total": "number",
+            "page": "number",
+            "limit": "number"
+          }
+        }
+      },
+      "getById": {
+        "method": "GET",
+        "path": "/circles/:id",
+        "requiresAuth": false,
+        "pathParams": {
+          "id": "string (circle ID)"
+        },
+        "responses": {
+          "200": {
+            "id": "string",
+            "name": "string",
+            "description": "string|null",
+            "isPrivate": "boolean",
+            "memberCount": "number",
+            "createdAt": "string (ISO 8601)",
+            "createdBy": "string"
+          }
+        }
+      }
+    },
+    "posts": {
+      "list": {
+        "method": "GET",
+        "path": "/posts/",
+        "requiresAuth": false,
+        "queryParams": {
+          "page": "number (optional)",
+          "limit": "number (optional)"
+        },
+        "responses": {
+          "200": {
+            "items": [
+              {
+                "id": "string",
+                "authorId": "string",
+                "content": "string",
+                "circleId": "string|null",
+                "attachments": "string[]|null",
+                "tags": "string[]|null",
+                "likesCount": "number",
+                "commentsCount": "number",
+                "createdAt": "string (ISO 8601)",
+                "updatedAt": "string (ISO 8601)"
+              }
+            ],
+            "total": "number",
+            "page": "number",
+            "limit": "number"
+          }
+        }
+      },
+      "create": {
+        "method": "POST",
+        "path": "/posts/",
+        "requiresAuth": true,
+        "body": {
+          "authorId": "string (required)",
+          "content": "string (1-2000 chars, required)",
+          "circleId": "string (optional)",
+          "attachments": "string[] (optional)",
+          "tags": "string[] (optional)"
+        },
+        "responses": {
+          "201": {
+            "id": "string",
+            "authorId": "string",
+            "content": "string",
+            "circleId": "string|null",
+            "attachments": "string[]|null",
+            "tags": "string[]|null",
+            "likesCount": "number",
+            "commentsCount": "number",
+            "createdAt": "string (ISO 8601)",
+            "updatedAt": "string (ISO 8601)"
+          }
+        }
+      }
+    },
+    "notifications": {
+      "list": {
+        "method": "GET",
+        "path": "/notifications/",
+        "requiresAuth": true,
+        "responses": {
+          "200": {
+            "items": [
+              {
+                "id": "string",
+                "type": "like|comment|follow|mention",
+                "title": "string",
+                "message": "string",
+                "isRead": "boolean",
+                "createdAt": "string (ISO 8601)",
+                "relatedId": "string|null"
+              }
+            ],
+            "total": "number",
+            "unreadCount": "number"
+          }
+        }
+      }
+    },
+    "assistant": {
+      "modes": {
+        "method": "GET",
+        "path": "/assistant/modes",
+        "requiresAuth": false,
+        "responses": {
+          "200": {
+            "items": [
+              {
+                "id": "string",
+                "name": "string",
+                "description": "string",
+                "capabilities": "string[]"
+              }
+            ]
+          }
+        }
+      },
+      "createSession": {
+        "method": "POST",
+        "path": "/assistant/sessions",
+        "requiresAuth": true,
+        "body": {
+          "mode": "string (optional, default: general)"
+        },
+        "responses": {
+          "201": {
+            "sessionId": "string",
+            "mode": "string",
+            "createdAt": "string (ISO 8601)",
+            "status": "active|paused|ended"
+          }
+        }
+      }
+    },
+    "realtime": {
+      "health": {
+        "method": "GET",
+        "path": "/realtime/health",
+        "requiresAuth": false,
+        "responses": {
+          "200": {
+            "status": "ok|degraded|down",
+            "connections": {
+              "websocket": "number",
+              "sse": "number",
+              "total": "number"
+            },
+            "uptime": "number",
+            "features": {
+              "websocket": "boolean",
+              "sse": "boolean",
+              "webrtc": "boolean"
+            }
+          }
+        }
+      },
+      "websocket": {
+        "method": "WebSocket",
+        "path": "/realtime/ws",
+        "requiresAuth": true,
+        "protocol": "wss",
+        "authMethod": "message",
+        "authFormat": {
+          "type": "auth",
+          "token": "jwt_token"
+        },
+        "messageTypes": {
+          "subscribe": {
+            "type": "subscribe",
+            "channel": "string"
+          },
+          "unsubscribe": {
+            "type": "unsubscribe",
+            "channel": "string"
+          },
+          "message": {
+            "type": "message",
+            "channel": "string",
+            "data": "any"
+          }
+        }
+      },
+      "sse": {
+        "method": "GET",
+        "path": "/realtime/sse/:channel",
+        "requiresAuth": true,
+        "pathParams": {
+          "channel": "string (posts|notifications|messages)"
+        },
+        "queryParams": {
+          "token": "string (JWT token)"
+        },
+        "responses": {
+          "200": "text/event-stream"
+        }
+      },
+      "broadcast": {
+        "method": "POST",
+        "path": "/realtime/broadcast",
+        "requiresAuth": true,
+        "body": {
+          "type": "string (required)",
+          "channel": "string (required)",
+          "data": "any (required)"
+        },
+        "responses": {
+          "200": {
+            "success": "boolean",
+            "message": "string"
+          }
+        }
+      }
+    },
+    "navigation": {
+      "links": {
+        "method": "GET",
+        "path": "/navigation/links",
+        "requiresAuth": false,
+        "responses": {
+          "200": {
+            "items": [
+              {
+                "id": "string",
+                "title": "string",
+                "url": "string (URI format)",
+                "icon": "string|null",
+                "order": "number",
+                "isExternal": "boolean"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "system": {
+      "health": {
+        "method": "GET",
+        "path": "/healthz",
+        "requiresAuth": false,
+        "responses": {
+          "200": {
+            "status": "ok"
+          }
+        }
+      },
+      "swagger": {
+        "method": "GET",
+        "path": "/swagger",
+        "requiresAuth": false,
+        "responses": {
+          "200": "text/html (Swagger UI)"
+        }
+      }
+    }
+  },
+  "errorCodes": {
+    "200": "Success",
+    "201": "Created",
+    "400": "Bad Request",
+    "401": "Unauthorized",
+    "403": "Forbidden",
+    "404": "Not Found",
+    "409": "Conflict",
+    "500": "Internal Server Error"
+  },
+  "realtimeChannels": {
+    "posts": "Updates about new posts, likes, comments",
+    "notifications": "User notifications",
+    "messages": "Private messages"
+  },
+  "examples": {
+    "authentication": {
+      "register": {
+        "request": {
+          "email": "user@example.com",
+          "password": "securepassword123",
+          "firstName": "Иван",
+          "lastName": "Иванов"
+        },
+        "response": {
+          "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "tokenType": "Bearer",
+          "expiresIn": 86400,
+          "user": {
+            "id": "user_123",
+            "email": "user@example.com",
+            "firstName": "Иван",
+            "lastName": "Иванов",
+            "role": "user"
+          }
+        }
+      }
+    },
+    "postCreation": {
+      "request": {
+        "authorId": "user_123",
+        "content": "Мой первый пост в Sobranie!",
+        "tags": ["первый_пост", "соцсеть"]
+      },
+      "response": {
+        "id": "post_456",
+        "authorId": "user_123",
+        "content": "Мой первый пост в Sobranie!",
+        "circleId": null,
+        "attachments": null,
+        "tags": ["первый_пост", "соцсеть"],
+        "likesCount": 0,
+        "commentsCount": 0,
+        "createdAt": "2024-01-15T11:45:00.000Z",
+        "updatedAt": "2024-01-15T11:45:00.000Z"
+      }
+    }
+  }
+}

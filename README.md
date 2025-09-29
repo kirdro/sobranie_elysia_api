@@ -77,18 +77,23 @@ scripts/             # Утилиты для миграций, документ�
 
 ## 📚 Документация
 
-### API документация
+### 🔗 API Документация для интеграции
+- 📋 [**Полная документация API**](docs/api-documentation.md) - Детальное описание всех endpoints
+- 📊 [**Таблица endpoints**](docs/api-endpoints-table.md) - Быстрый справочник
+- 🔌 [**Примеры интеграции**](docs/integration-examples.md) - Код для JS/TS, Python, PHP, cURL
+- 📝 [**JSON схема API**](docs/api-schema.json) - Машиночитаемая схема для ИИ-агентов
+
+### 🌐 Интерактивная документация
 - **OpenAPI UI**: http://localhost:3000/openapi (dev) / https://api.sobranie.yaropolk.tech/openapi (prod)
 - **OpenAPI JSON**: http://localhost:3000/openapi/json
 
-### Проектная документация
+### 🏗️ Техническая документация
 - Чеклист реализации: `docs/implementation-checklist.md`
 - Модель данных: `docs/data-model.md`
 - Реалтайм-стратегия: `docs/realtime-strategy.md`
 - Спецификация событий: `docs/realtime-events.md`
 - Авторизация: `docs/auth-implementation.md`
 - Деплой: `deploy/README.md`
-
 - GitHub Actions workflow: `.github/workflows/deploy.yml`
 
 ## Дальнейшие шаги
