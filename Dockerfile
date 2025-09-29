@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json bun.lockb* ./
 
 # Устанавливаем зависимости
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile || bun install
 
 # Копируем Prisma схему и генерируем клиент
 COPY prisma ./prisma
