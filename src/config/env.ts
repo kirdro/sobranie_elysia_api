@@ -11,7 +11,7 @@ const envSchema = z.object({
     .default("3000")
     .transform((value) => Number.parseInt(value, 10))
     .pipe(z.number().int().positive()),
-  DATABASE_URL: z.string().url().optional(),
+  DATABASE_URL: z.string().optional(), // Временно убираем URL валидацию
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
     .default("info"),
