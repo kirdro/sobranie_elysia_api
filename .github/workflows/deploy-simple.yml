@@ -30,8 +30,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          # Строим образ
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
+          # Строим образ (используем простой Dockerfile для избежания проблем)
+          docker build -f Dockerfile.simple -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
           
           # Добавляем дополнительный тег с SHA коммита
           docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \

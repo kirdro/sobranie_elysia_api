@@ -10,9 +10,11 @@
 
 ### 2. Проверка кода
 - [x] TypeScript компилируется без ошибок
+- [x] ✅ Исправлена проблема с Prisma в Docker (postinstall)
 - [x] Dockerfile создан и оптимизирован
+- [x] Dockerfile.simple создан для быстрой сборки
 - [x] docker-compose.prod.yml настроен
-- [x] GitHub Actions workflow готов
+- [x] GitHub Actions workflow готов (2 варианта)
 - [x] Caddy конфигурация подготовлена
 
 ### 3. На сервере

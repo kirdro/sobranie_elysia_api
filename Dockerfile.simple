@@ -1,0 +1,38 @@
+# Простой Dockerfile без мультистейдж сборки для быстрого тестирования
+FROM oven/bun:1.2.20-alpine
+
+# Устанавливаем необходимые пакеты
+RUN apk add --no-cache openssl
+
+WORKDIR /app
+
+# Копируем файлы зависимостей и Prisma схему
+COPY package.json bun.lockb* ./
+COPY prisma ./prisma
+
+# Устанавливаем зависимости без postinstall скриптов
+RUN bun install --frozen-lockfile --ignore-scripts || bun install --ignore-scripts
+
+# Генерируем Prisma клиент
+RUN bunx prisma generate
+
+# Копируем весь исходный код
+COPY . .
+
+# Создаем пользователя для запуска приложения
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
+
+# Переключаемся на пользователя nodejs
+USER nodejs
+
+# Экспонируем порт
+EXPOSE 3000
+
+# Проверка здоровья контейнера
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD bun --eval "fetch('http://localhost:3000/healthz').then(r => process.exit(r.ok ? 0 : 1))" || exit 1
+
+# Запускаем приложение напрямую из исходников
+CMD ["bun", "run", "src/index.ts"]

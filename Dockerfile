@@ -3,14 +3,14 @@ FROM oven/bun:1.2.20-alpine AS builder
 
 WORKDIR /app
 
-# Копируем файлы зависимостей
+# Копируем файлы зависимостей и Prisma схему сразу
 COPY package.json bun.lockb* ./
-
-# Устанавливаем зависимости
-RUN bun install --frozen-lockfile || bun install
-
-# Копируем Prisma схему и генерируем клиент
 COPY prisma ./prisma
+
+# Устанавливаем зависимости без postinstall скриптов
+RUN bun install --frozen-lockfile --ignore-scripts || bun install --ignore-scripts
+
+# Генерируем Prisma клиент вручную
 RUN bunx prisma generate
 
 # Копируем исходный код
