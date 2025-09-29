@@ -1,8 +1,8 @@
-version: '3.8'
+# version: '3.8'  # Удаляем устаревший атрибут
 
 services:
   sobranie-api:
-    image: ghcr.io/yaropolk/sobranie-api:latest
+    image: ghcr.io/kirdro/sobranie_elysia_api:latest
     container_name: sobranie-api
     restart: unless-stopped
     ports:
