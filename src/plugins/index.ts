@@ -9,7 +9,12 @@ import { rateLimitPlugin } from "./rate-limit";
 
 export const registerPlugins = (app: Elysia) =>
   app
-    .use(cors())
+    .use(cors({
+      origin: ['http://localhost:3000'],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+    }))
     .use(openapi({
       documentation: {
         info: {
