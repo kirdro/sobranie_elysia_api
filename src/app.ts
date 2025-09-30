@@ -6,7 +6,10 @@ import { registerPlugins } from "./plugins";
 export const createApp = () => {
   const app = new Elysia({ name: "sobranie" });
 
+  // Register plugins first (includes CORS)
   registerPlugins(app);
+
+  // Then register modules
   registerModules(app);
 
   app

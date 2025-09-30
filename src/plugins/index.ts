@@ -1,11 +1,12 @@
 import { Elysia } from "elysia";
-import { cors } from "@elysiajs/cors";
+// import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 
 import { authPlugin } from "./auth";
 import { loggerPlugin } from "./logger";
 import { prismaPlugin } from "./prisma";
 import { rateLimitPlugin } from "./rate-limit";
+import { corsManualPlugin } from "./cors-manual";
 
 export const registerPlugins = (app: Elysia) => {
   // Parse CORS origins from environment variable
@@ -16,15 +17,8 @@ export const registerPlugins = (app: Elysia) => {
   console.log('CORS Origins configured:', corsOrigins);
 
   return app
-    .use(cors({
-      origin: corsOrigins,
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-      exposeHeaders: ['Content-Length', 'Content-Type'],
-      maxAge: 86400, // Cache preflight for 24 hours
-      preflight: true // Explicitly handle preflight
-    }))
+    // Use manual CORS implementation for better control
+    .use(corsManualPlugin)
     .use(openapi({
       documentation: {
         info: {
