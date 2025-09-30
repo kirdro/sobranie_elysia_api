@@ -20,9 +20,10 @@ export const registerPlugins = (app: Elysia) => {
       origin: corsOrigins,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
       exposeHeaders: ['Content-Length', 'Content-Type'],
-      maxAge: 86400 // Cache preflight for 24 hours
+      maxAge: 86400, // Cache preflight for 24 hours
+      preflight: true // Explicitly handle preflight
     }))
     .use(openapi({
       documentation: {
