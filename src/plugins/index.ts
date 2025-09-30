@@ -7,13 +7,22 @@ import { loggerPlugin } from "./logger";
 import { prismaPlugin } from "./prisma";
 import { rateLimitPlugin } from "./rate-limit";
 
-export const registerPlugins = (app: Elysia) =>
-  app
+export const registerPlugins = (app: Elysia) => {
+  // Parse CORS origins from environment variable
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
+    : ['http://localhost:3000'];
+
+  console.log('CORS Origins configured:', corsOrigins);
+
+  return app
     .use(cors({
-      origin: ['http://localhost:3000'],
+      origin: corsOrigins,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization']
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      exposeHeaders: ['Content-Length', 'Content-Type'],
+      maxAge: 86400 // Cache preflight for 24 hours
     }))
     .use(openapi({
       documentation: {
@@ -39,3 +48,4 @@ export const registerPlugins = (app: Elysia) =>
     .use(prismaPlugin)
     .use(authPlugin)
     .use(rateLimitPlugin);
+};
